@@ -8,7 +8,7 @@ categories: [
 ]
 ---
 
-Initial commit! It's a new beginning! Old blog posts are at [here](https://oldblog.hwc.io).
+Initial commit! It's a new beginning! Old blog posts are at [here](http://oldblog.hwc.io).
 
 My last blog was mostly about my road from non-programmer to getting my first programming job. I discussed my job search, learning Haskell, and learning Rust. After getting a programming job, though, I had to devote most of my critical thinking energies to writing production-ready code.
 
