@@ -1,4 +1,4 @@
-baseURL = "https://blog.hwc.io"
+baseURL = "https://blog.hwc.io/"
 title = "hwc::blog"
 theme = "temple"
 # If not set, it will not appear. Otherwise it will show below your footer links
