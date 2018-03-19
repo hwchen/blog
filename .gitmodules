@@ -1,0 +1,15 @@
+[submodule "themes/one"]
+	path = themes/one
+	url = https://github.com/resugary/hugo-theme-one.git
+[submodule "themes/cocoa"]
+	path = themes/cocoa
+	url = https://github.com/nishanths/cocoa-hugo-theme.git
+[submodule "themes/beautifulhugo"]
+	path = themes/beautifulhugo
+	url = https://github.com/halogenica/beautifulhugo.git
+[submodule "themes/natrium"]
+	path = themes/natrium
+	url = https://github.com/mobybit/hugo-natrium-theme
+[submodule "themes/temple"]
+	path = themes/temple
+	url = https://github.com/aos/temple.git
