@@ -4,7 +4,8 @@ date: "2018-03-18"
 draft: false
 categories: [
   "career",
-  "projects",
+  "code",
+  "math",
 ]
 ---
 
