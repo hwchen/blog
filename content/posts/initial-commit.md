@@ -1,7 +1,7 @@
 ---
 title: "Initial Commit"
 date: "2018-03-18"
-draft: false
+draft: true
 categories: [
   "career",
   "code",
