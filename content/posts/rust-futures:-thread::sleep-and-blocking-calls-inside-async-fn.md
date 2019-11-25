@@ -24,7 +24,7 @@ async fn get_book_and_music() -> (Book, Music) {
 }
 ```
 
-Even if you were to `log` inside `get_book` and `get_music`, there's no easy way to tell that they are run concurrently because any one run may produce output that happens to match the order in the code. You'd have to run the program several times in order to see that the logging order may flip.
+Even if you were to `log` inside `get_book` and `get_music`, there's no easy way to tell that they are run concurrently because any one run may produce output that happens to match the order in the code. You'd have to run the program several times in order to see that the logging order may flip (and what if it didn't flip?).
 
 If you want to be able to see that `get_book` and `get_music` are run concurrently 100% of the time, you might want to log their starting times, and see that the starting times are the same. But wait, what if the starting times are still serial, but the fn runs so fast it still looks concurrent?
 
@@ -84,7 +84,39 @@ First, I'll just say that it makes sense to think this; part of the pitch of `as
 
 Unfortunately, that's not how Rust's `async` paradigm works. `async` is powerful, but at its core it just provides a nicer way to handle `Future`s. And a `Future` does not just automatically move a blocking call to the side to allow other work to be done; it uses a totally separate system, with polling and async runtimes, to do the async dance. Any blocking call made within that system will still be blocking.
 
-So, it's better to think of `async` as something that allows `await` inside a function or a block, but doesn't actually make anything async.
+There might be some confusion, because `async/await` is supposed to allow us to write code that looks more like regular (blocking) code. That's where the `await` part of `async/await` comes in. When you `await` a future inside of an `async` block, it will be able to schedule itself off the thread and make way for another task. Blocking code might look similar, but can't be `await`ed because it's not a future, and won't be able to make "space" for another task.
+
+So this won't block, but `await` lets you write code that looks pretty similar to blocking calls:
+```rust
+async {
+    let f = get_file_async().await;
+    let resp = fetch_api_async().await;
+}
+```
+
+And this will block at each call:
+```rust
+async {
+    let f = get_file_blocking();
+    let resp = fetch_api_blocking();
+}
+```
+And this won't compile:
+```rust
+async {
+    let f = get_file_blocking().await;
+    let resp = fetch_api_blocking().await;
+}
+```
+And nothing happens here (you've got to `await` futures inside of `async`!):
+```rust
+async {
+    let f = get_file_async();
+    let resp = fetch_api_async();
+}
+```
+
+Overall, it's better to think of `async` as something that allows `await` inside a function or a block, but doesn't actually make anything async.
 
 ## How to unblock
 What if you want to unblock your async fn?
@@ -102,6 +134,11 @@ The other option is to move the blocking call to another thread.
 - [async_std::task::spawn_blocking](https://docs.rs/async-std/1.1.0/async_std/task/fn.spawn_blocking.html)
 
 This requires that your runtime have machinery (such as a thread pool) dedicated to offloading blocking calls.
+
+I've also filed some issues to try to prevent others from falling into this trap:
+
+- [async-book](https://github.com/rust-lang/async-book/issues/64)
+- [clippy](https://github.com/rust-lang/rust-clippy/issues/4377)
 
 ## Conclusion
 Hope that the this blog was able to clarify some things about how blocking calls interact with Rust's concurrency model! Feel free to give feedback.
