@@ -84,7 +84,7 @@ First, I'll just say that it makes sense to think this; part of the pitch of `as
 
 Unfortunately, that's not how Rust's `async` paradigm works. `async` is powerful, but at its core it just provides a nicer way to handle `Future`s. And a `Future` does not just automatically move a blocking call to the side to allow other work to be done; it uses a totally separate system, with polling and async runtimes, to do the async dance. Any blocking call made within that system will still be blocking.
 
-There might be some confusion, because `async/await` is supposed to allow us to write code that looks more like regular (blocking) code. That's where the `await` part of `async/await` comes in. When you `await` a future inside of an `async` block, it will be able to schedule itself off the thread and make way for another task. Blocking code might look similar, but can't be `await`ed because it's not a future, and won't be able to make "space" for another task.
+There might be some confusion because `async/await` is allows us to write code that _looks_ more like regular (blocking) code. That's where the `await` part of `async/await` comes in. When you `await` a future inside of an `async` block, it will be able to schedule itself off the thread and make way for another task. Blocking code might look similar, but can't be `await`ed because it's not a future, and won't be able to make "space" for another task.
 
 So this won't block, but `await` lets you write code that looks pretty similar to blocking calls:
 ```rust
