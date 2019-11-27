@@ -123,15 +123,15 @@ What if you want to unblock your async fn?
 
 You could find an async alternative: while `thread::sleep` is blocking, you might use these (depending on which runtime ecosystem you choose):
 
-- [async_std::task::sleep](https://docs.rs/async-std/1.1.0/async_std/task/fn.sleep.html)
-- [tokio::time::Delay](https://docs.rs/tokio-timer/0.3.0-alpha.5/tokio_timer/struct.Delay.html)
+- [async_std::task::sleep (1.0)](https://docs.rs/async-std/1.1.0/async_std/task/fn.sleep.html)
+- [tokio::time::delay_for (0.2.0)](https://docs.rs/tokio/0.2.0/tokio/time/fn.delay_for.html)
 
 Both `tokio` and `async_std` offer async alternatives for other blocking operations too, such as filesystem and tcp stream access.
 
 The other option is to move the blocking call to another thread.
 
-- [tokio_executor::threadpool::blocking](https://docs.rs/tokio-executor/0.2.0-alpha.5/tokio_executor/threadpool/fn.blocking.html)
-- [async_std::task::spawn_blocking](https://docs.rs/async-std/1.1.0/async_std/task/fn.spawn_blocking.html)
+- [tokio::task::spawn_blocking (0.2.0)](https://docs.rs/tokio/0.2.0/tokio/task/fn.spawn_blocking.html)
+- [async_std::task::spawn_blocking (1.0)](https://docs.rs/async-std/1.1.0/async_std/task/fn.spawn_blocking.html)
 
 This requires that your runtime have machinery (such as a thread pool) dedicated to offloading blocking calls.
 
