@@ -39,13 +39,13 @@ For me, the first option (starting a new runtime just for a library) doesn't hav
 The last option, reducing the surface area of the library, is the most appealing to me when possible. While it requires more work from the user, it's straightforward and transparent.
 
 # Motivation for tophat
-Since learning Rust, I've been increasing excited about moving down the stack. While my day job is as a backend/data engineer, I've used Rust as a way to learn about lower-level implementations. For one project, I wanted to learn more about https servers: parsing requests, server architecture, etc. I became quite excited looking at `async-h1` because it was a clear and easy codebase to navigate. It also chose option three (from "how to support multiple runtimes" above"), where it receives a stream that's `AsyncRead/AsyncWrite`.
+Since learning Rust, I've been increasingly excited about moving down the stack. While my day job is as a backend/data engineer, I've used Rust as a way to learn about lower-level implementations. For one project, I wanted to learn more about https servers: parsing requests, server architecture, etc. I became quite excited looking at `async-h1` because it was a clear and easy codebase to navigate. It also chose option three (from "how to support multiple runtimes" above"), where it receives a stream that's `AsyncRead/AsyncWrite`.
 
-At the same time, I was also learning more about async executors. My codebase of choice was [smol](https://github.com/smol-rs/smol). It's not one of the major async runtimes, but it was designed to be small, flexible, and performant. It was not difficult to get `async-h1` running on `smol`. However, I noticed that in the process, I pulled in `async-std` as a dependency from `async-h1`, and which started a separate runtime. I got this itch, where I wanted to get `async-h1` running without pulling in `async-std`.
+At the same time, I was also learning more about async executors. My codebase of choice was [smol](https://github.com/smol-rs/smol). It's not one of the major async runtimes, but it was designed to be small, flexible, and performant. It was not difficult to get `async-h1` running on `smol`. However, I noticed that in the process, I pulled in `async-std` (a dependency of `async-h1`), which started a separate runtime. I got this itch, where I wanted to get `async-h1` running without pulling in `async-std`.
 
-However, I didn't really act on it right away. I guess I needed more motivation than just making `async-h1` runtime-agnostic. That came a little while later, when I was reading the issues for `hyper`, `tokio`'s http server.
+I didn't act on this impulse immediately. I guess I needed more motivation than just making `async-h1` runtime-free. That came a little while later, when I was reading the issues for `hyper`, `tokio`'s http server.
 
-I noticed an issue for [increasing observability](https://github.com/hyperium/hyper/issues/2181). Basically, `hyper`'s service architecture takes response handlers with an simplified signature of `Fn(Request) -> Response`. This means that the handler doesn't have knowledge of the outcome of sending the `Response`. Instead, the simplified signature `Fn(Request, ResponseWrite) -> ResponseWriten` would allow the handler to see the outcome of writing the response. (Also, note that this is similar to the handler signature that Golang chose).
+I noticed an issue for [increasing observability](https://github.com/hyperium/hyper/issues/2181) in `hyper`. Basically, `hyper`'s service architecture takes handlers with an simplified signature of `Fn(Request) -> Response`. This means that the handler doesn't have knowledge of the outcome of sending the `Response`. Instead, the simplified signature `Fn(Request, ResponseWrite) -> ResponseWritten` would allow the handler to see the outcome of writing the response. (Also, note that this is similar to the handler signature that Golang chose).
 
 Some use cases for this pattern, mentioned in the issue:
 
@@ -53,7 +53,7 @@ Some use cases for this pattern, mentioned in the issue:
 - Logging the timing of a response (time-to-last-byte).
 - Logging the amount of transmitted bytes (to diagnose failures).
 
-It seemed like implementing this pattern would be a little different (for Rust async); and I thought that this, plus being async-runtime agnostic, would be a fun and worthwhile challenge. It might even be potentially useful to others!
+It seemed like implementing this pattern would be a little different (for Rust async); and I thought that this, plus creating an async-runtime agnostic library, would be a fun and worthwhile challenge. It might even be potentially useful to others!
 
 # pre-1.0
 I've finally reached a point where I feel comfortable presenting `tophat` more publicly. While it's definitely not 1.0, it should be useable for basic apis. There's even some conveniences, like a router and error-response handling!
