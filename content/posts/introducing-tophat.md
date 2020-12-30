@@ -14,7 +14,7 @@ Its main points:
 
 For a quick example, go to bottom of this post.
 
-I want to first thank the Rust async and web community for all the work they've done. Tophat is largely a remix of code from [async-h1](https://github.com/http-rs/async-h1), with a good sprinkling of libraries from the [hyperium](https://github.com/hyperium) project.
+I want to first thank the Rust async and web community for all the work they've done. `Tophat` is largely a remix of code from [async-h1](https://github.com/http-rs/async-h1), with a good sprinkling of libraries from the [hyperium](https://github.com/hyperium) project.
 
 # Rust Async Background
 For those readers who are not as familiar with the Rust async ecosystem, this section may provide more background on `tophat`'s design choices.
