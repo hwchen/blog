@@ -56,7 +56,7 @@ Some use cases for this pattern, mentioned in the issue:
 It seemed like implementing this pattern would be a little different (for Rust async); and I thought that this, plus creating an async-runtime agnostic library, would be a fun and worthwhile challenge. It might even be potentially useful to others!
 
 # pre-1.0
-I've finally reached a point where I feel comfortable presenting `tophat` more publicly. While it's definitely not 1.0, it should be useable for basic apis. There's even some conveniences, like a router and error-response handling!
+I've finally reached a point where I feel comfortable presenting `tophat` more publicly. While it's definitely not v1.0, at v0.3.0 it should be useable for basic apis. There's even some conveniences, like a router and error-response handling!
 
 Feature list:
 
