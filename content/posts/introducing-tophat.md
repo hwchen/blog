@@ -7,6 +7,7 @@ draft: false
 [Tophat](https://github.com/hwchen/tophat) is a small, pragmatic, and flexible async http server library for Rust.
 
 Its main points:
+
 - no async runtime dependencies.
 - works with `AsyncRead/AsyncWrite`.
 - `Fn(Request, ResponseWrite) -> ResponseWritten` instead of `Fn(Request) -> Response` allows more observability of response lifecycle.
@@ -21,10 +22,12 @@ For those readers who are not as familiar with the Rust async ecosystem, this se
 There are two major async ecosystems for Rust: `tokio` and `async-std`. Because Rust does not have a bundled standard async runtime, each ecosystem provides its own.
 
 Libraries developed for one ecosystem may not work with the other. The roadblocks are generally:
+
 - Usage of different `AsyncRead/AsyncWrite` traits in each ecosystem. This can be overcome with a shim like tokio's [compat](https://docs.rs/tokio-util/0.6.0/tokio_util/compat/index.html).
 - Usage of `spawn` for new tasks, tied to the executor of an ecosystem. There's currently no easy solution, creating a bridge requires a trait in std.
 
 Library authors who want to support multiple runtimes have three options:
+
 - Have the library start its own runtime in the background if necessary.
 - Use feature flags to switch runtime-specific code on/off in the library.
 - Reduce the surface area of the library: removing internal spawns tied to a runtime and requiring tasks to be spawned in user code. This strategy will work if the library can, for example, accept just `AsyncRead/AsyncWrite`.
@@ -45,6 +48,7 @@ However, I didn't really act on it right away. I guess I needed more motivation 
 I noticed an issue for [increasing observability](https://github.com/hyperium/hyper/issues/2181). Basically, `hyper`'s service architecture takes response handlers with an simplified signature of `Fn(Request) -> Response`. This means that the handler doesn't have knowledge of the outcome of sending the `Response`. Instead, the simplified signature `Fn(Request, ResponseWrite) -> ResponseWriten` would allow the handler to see the outcome of writing the response. (Also, note that this is similar to the handler signature that Golang chose).
 
 Some use cases for this pattern, mentioned in the issue:
+
 - Logging the outcome of a request to metrics.
 - Logging the timing of a response (time-to-last-byte).
 - Logging the amount of transmitted bytes (to diagnose failures).
@@ -55,6 +59,7 @@ It seemed like implementing this pattern would be a little different (for Rust a
 I've finally reached a point where I feel comfortable presenting `tophat` more publicly. While it's definitely not 1.0, it should be useable for basic apis. There's even some conveniences, like a router and error-response handling!
 
 Feature list:
+
 - no async runtime deps
 - HTTP/1.1 only
 - #[deny(unsafe_code)]
@@ -66,6 +71,7 @@ Feature list:
 I've got some [examples](https://github.com/hwchen/tophat/tree/main/examples) ready, including one for a basic [api](https://github.com/hwchen/tophat/tree/main/examples/postgres) using tokio-compat, tokio-postgres, and deadpool.
 
 Some tasks for the near future:
+
 - keep improving correctness
 - fuzzing
 - more docs/examples
