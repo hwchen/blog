@@ -39,7 +39,7 @@ For me, the first option (starting a new runtime just for a library) doesn't hav
 The last option, reducing the surface area of the library, is the most appealing to me when possible. While it requires more work from the user, it's straightforward and transparent.
 
 # Motivation for tophat
-Since learning Rust, I've been increasingly excited about moving down the stack. While my day job is as a backend/data engineer, I've used Rust as a way to learn about lower-level implementations. For one project, I wanted to learn more about https servers: parsing requests, server architecture, etc. I became quite excited looking at `async-h1` because it was a clear and easy codebase to navigate. It also chose option three (from "how to support multiple runtimes" above"), where it receives a stream that's `AsyncRead/AsyncWrite`.
+Since learning Rust, I've been increasingly excited about moving down the stack. While my day job is as a backend/data engineer, I've used Rust as a way to learn about lower-level implementations. For one project, I wanted to learn more about http servers: parsing requests, server architecture, etc. I became quite excited looking at `async-h1` because it was a clear and easy codebase to navigate. It also chose option three (from "how to support multiple runtimes" above"), where it receives a stream that's `AsyncRead/AsyncWrite`.
 
 At the same time, I was also learning more about async executors. My codebase of choice was [smol](https://github.com/smol-rs/smol). It's not one of the major async runtimes, but it was designed to be small, flexible, and performant. It was not difficult to get `async-h1` running on `smol`. However, I noticed that in the process, I pulled in `async-std` (a dependency of `async-h1`), which started a separate runtime. I got this itch, where I wanted to get `async-h1` running without pulling in `async-std`.
 
@@ -91,7 +91,7 @@ use async_dup::Arc;
 use tophat::server::accept;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listener = Async::<TcpListener>::bind("127.0.0.1:9999")?;
+    let listener = Async::<TcpListener>::bind(([127,0,0,1],9999))?;
 
     smol::block_on(async {
         loop {
