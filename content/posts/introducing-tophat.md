@@ -19,20 +19,20 @@ I want to first thank the Rust async and web community for all the work they've 
 # Rust Async Background
 For those readers who are not as familiar with the Rust async ecosystem, this section may provide more background on `tophat`'s design choices.
 
-There are two major async ecosystems for Rust: `tokio` and `async-std`. Because Rust does not have a bundled standard async runtime, each ecosystem provides its own.
+Rust does not have a bundled standard async runtime. Instead, users can choose from libraries that implement async runtimes, each with their own set of tradeoffs. While there are several in development, two have become the defacto choices for most web and network development: [tokio](https://tokio.rs/) and [async-std](https://async.rs/).
 
-Libraries developed for one ecosystem may not work with the other. The roadblocks are generally:
+Libraries developed for one runtime may not work with the other. The roadblocks are generally:
 
-- Usage of different `AsyncRead/AsyncWrite` traits in each ecosystem. This can be overcome with a shim like tokio's [compat](https://docs.rs/tokio-util/0.6.0/tokio_util/compat/index.html).
+- Usage of different `AsyncRead/AsyncWrite` traits in each ecosystem. Currently, this can be overcome with a shim like tokio's [compat](https://docs.rs/tokio-util/0.6.0/tokio_util/compat/index.html). In the future, these traits may be standardized.
 - Usage of `spawn` for new tasks, tied to the executor of an ecosystem. There's currently no easy solution, creating a bridge requires a trait in std.
 
-Library authors who want to support multiple runtimes have three options:
+Library authors who want to support multiple runtimes have some options:
 
 - Have the library start its own runtime in the background if necessary.
 - Use feature flags to switch runtime-specific code on/off in the library.
 - Reduce the surface area of the library: removing internal spawns tied to a runtime and requiring tasks to be spawned in user code. This strategy will work if the library can, for example, accept just `AsyncRead/AsyncWrite`.
 
-At the moment, many libraries are supporting option number two: feature flags. Perhaps this is tenable when there's only two runtimes to support. But if Rust would like to grow a diverse async ecosystem, this path would become more difficult as library authors have to support new code for each runtime.
+At the moment, many libraries are supporting option number two: feature flags. Perhaps this is tenable when there's only two runtimes to support. But if Rust tries to grow a more diverse async ecosystem, this path becomes more difficult as library authors have to support new code for each runtime.
 
 For me, the first option (starting a new runtime just for a library) doesn't have the best feel to me, even if it's possible. Rust is a language which values control and explicitness over resources. While this option may be more convenient for users, it pushes a major resource-handling choice into the background.
 
@@ -41,11 +41,11 @@ The last option, reducing the surface area of the library, is the most appealing
 # Motivation for tophat
 Since learning Rust, I've been increasingly excited about moving down the stack. While my day job is as a backend/data engineer, I've used Rust as a way to learn about lower-level implementations. For one project, I wanted to learn more about http servers: parsing requests, server architecture, etc. I became quite excited looking at `async-h1` because it was a clear and easy codebase to navigate. It also chose option three (from "how to support multiple runtimes" above"), where it receives a stream that's `AsyncRead/AsyncWrite`.
 
-At the same time, I was also learning more about async executors. My codebase of choice was [smol](https://github.com/smol-rs/smol). It's not one of the major async runtimes, but it was designed to be small, flexible, and performant. It was not difficult to get `async-h1` running on `smol`. However, I noticed that in the process, I pulled in `async-std` (a dependency of `async-h1`), which started a separate runtime. I got this itch, where I wanted to get `async-h1` running without pulling in `async-std`.
+At the same time, I was also learning more about async executors. My codebase of choice was [smol](https://github.com/smol-rs/smol). It's not one of the major async runtimes, but it was designed to be small, flexible, and performant. Getting `async-h1` up and running on `smol` was easy. However, I noticed that in the process, I pulled in `async-std` (a dependency of `async-h1`), which started a separate runtime. I got this itch, where I wanted to get `async-h1` running without pulling in `async-std`.
 
-I didn't act on this impulse immediately. I guess I needed more motivation than just making `async-h1` runtime-free. That came a little while later, when I was reading the issues for `hyper`, `tokio`'s http server.
+I didn't do anything about it immediately. I guess I needed more motivation than just making `async-h1` runtime-free. That came a little while later, when I was reading the issues for `hyper`, `tokio`'s http server.
 
-I noticed an issue for [increasing observability](https://github.com/hyperium/hyper/issues/2181) in `hyper`. Basically, `hyper`'s service architecture takes handlers with an simplified signature of `Fn(Request) -> Response`. This means that the handler doesn't have knowledge of the outcome of sending the `Response`. Instead, the simplified signature `Fn(Request, ResponseWrite) -> ResponseWritten` would allow the handler to see the outcome of writing the response. (Also, note that this is similar to the handler signature that Golang chose).
+I noticed a `hyper` issue for [increasing observability](https://github.com/hyperium/hyper/issues/2181). Basically, `hyper`'s service architecture takes handlers with an simplified signature of `Fn(Request) -> Response`. This means that the handler doesn't have knowledge of the outcome of sending the `Response`. Instead, the simplified signature `Fn(Request, ResponseWrite) -> ResponseWritten` would allow the handler to see the outcome of writing the response. (Also, note that this is similar to the handler signature that Golang chose).
 
 Some use cases for this pattern, mentioned in the issue:
 
@@ -68,7 +68,7 @@ Feature list:
 - server sent events
 - a `Glitch` system for conveniently converting errors to error-responses (e.g. 500) for simple error-handling cases.
 
-I've got some [examples](https://github.com/hwchen/tophat/tree/main/examples) ready, including one for a basic [api](https://github.com/hwchen/tophat/tree/main/examples/postgres) using tokio-compat, tokio-postgres, and deadpool.
+I've got some [examples](https://github.com/hwchen/tophat/tree/main/examples) ready, including one for a basic [api](https://github.com/hwchen/tophat/tree/main/examples/postgres) using smol, tokio-compat, tokio-postgres, and deadpool.
 
 Some tasks for the near future:
 
