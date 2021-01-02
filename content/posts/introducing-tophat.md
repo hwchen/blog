@@ -8,7 +8,7 @@ draft: false
 
 Its main points:
 
-- no async runtime dependencies.
+- no async runtime dependencies (user provides runtime).
 - works with `AsyncRead/AsyncWrite`.
 - `Fn(Request, ResponseWriter) -> ResponseWritten` instead of `Fn(Request) -> Response` allows more observability of response lifecycle.
 
