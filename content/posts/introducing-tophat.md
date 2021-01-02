@@ -10,7 +10,7 @@ Its main points:
 
 - no async runtime dependencies.
 - works with `AsyncRead/AsyncWrite`.
-- `Fn(Request, ResponseWrite) -> ResponseWritten` instead of `Fn(Request) -> Response` allows more observability of response lifecycle.
+- `Fn(Request, ResponseWriter) -> ResponseWritten` instead of `Fn(Request) -> Response` allows more observability of response lifecycle.
 
 For a quick example, go to bottom of this post.
 
